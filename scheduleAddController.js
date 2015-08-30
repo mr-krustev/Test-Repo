@@ -63,12 +63,54 @@ var appointment = (function () {
         var scheduleAddController = Object.create({});
         scheduleAddController.className += ' scheduleAddController';
 
+        var HEIGTH_OF_ELEMENT = 100;
+
+        // TODO: Rethink the visualize/hide part
+        Object.defineProperty(scheduleAddController, 'visualize', {
+            value: function () {
+                var controllerDOMElement = $('.scheduleAddController');
+                var i = 0,
+                    len = HEIGTH_OF_ELEMENT;
+
+                requestAnimationFrame(show);
+                function show() {
+                    i += 5;
+                    controllerDOMElement.css('height', i + 'px');
+                    if (i < len) {
+                        requestAnimationFrame(show);
+                    }
+                }
+            }
+        });
+
+        Object.defineProperty(scheduleAddController, 'hide', {
+            value: function () {
+                var controllerDOMElement = $('.scheduleAddController');
+                var i = HEIGTH_OF_ELEMENT,
+                    len = 0;
+
+                function hide() {
+                    i -= 5;
+                    controllerDOMElement.css('height', i + 'px');
+                    if (i > len) {
+                        requestAnimationFrame(hide);
+                    } else {
+                        controllerDOMElement.hide();
+                    }
+                }
+
+                requestAnimationFrame(hide);
+
+            }
+        });
+
         Object.defineProperty(scheduleAddController, 'renderUnusualEventAdding', {
             value: function () {
                 var result = document.createDocumentFragment();
                 result.appendChild(backButtonBox);
                 result.appendChild(nameBox);
-                result.appendChild(timeBox.cloneNode(true));
+                result.appendChild(startHourBox);
+                result.appendChild(endHourBox);
                 result.appendChild(descriptionBox);
                 result.appendChild(addAppointmentButton);
                 return result;
@@ -96,123 +138,149 @@ var appointment = (function () {
         });
 
         // Add Usual event
-        var usualEventBox = document.createElement('div');
-        usualEventBox.setAttribute('id', 'usual-event-button-box');
-        var usualEventButton = document.createElement('button');
-        usualEventButton.setAttribute('id', 'usual-event-button');
-        usualEventButton.className = 'btn';
-        usualEventButton.innerHTML = 'Add Usual Event';
-        usualEventBox.appendChild(usualEventButton);
+        var usualEventBox = $('<div/>', {
+            id: 'controller-usual-event-button-box'
+        });
+        var usualEventButton = $('<button/>', {
+            id: 'controller-usual-event-button'
+        })
+            .addClass('btn')
+            .html('Add Usual Event');
+        usualEventBox.append(usualEventButton);
+        //Makes the jQuery object into a normal js DOM element.
+        usualEventBox = usualEventBox.get(0);
 
         // Add Unusual event
-        var unusualEventBox = document.createElement('div');
-        unusualEventBox.setAttribute('id', 'unusual-event-button-box');
-        var unusualEventButton = document.createElement('button');
-        unusualEventButton.className = 'btn';
-        unusualEventButton.setAttribute('id', 'unusual-event-button');
-        unusualEventButton.innerHTML = 'Add Unusual Event';
-        unusualEventBox.appendChild(unusualEventButton);
+        var unusualEventBox = $('<div/>', {
+            id: 'controller-unusual-event-button-box'
+        });
+        var unusualEventButton = $('<button/>', {
+            id: 'controller-unusual-event-button'
+        })
+            .addClass('btn')
+            .html('Add Unusual Event');
+        unusualEventBox.append(unusualEventButton);
+        unusualEventBox = unusualEventBox.get(0);
 
-        //Back
-        var backButtonBox = document.createElement('div');
-        backButtonBox.setAttribute('id', 'controller-back-button-box');
-        var backButton = document.createElement('button');
-        backButton.setAttribute('id', 'controller-back-button');
-        backButton.className += 'btn';
-        backButton.innerHTML = 'Back';
-        backButtonBox.appendChild(backButton);
+        //Back to start
+        var backButtonBox = $('<div/>', {
+            id: 'controller-back-button-box'
+        });
+        var backButton = $('<button/>', {
+            id: 'controller-back-button'
+        })
+            .addClass('btn')
+            .html('Back');
+        backButtonBox.append(backButton);
+        backButtonBox = backButtonBox.get(0);
 
         //Usual Event
         //Appointment list
-        var appointmentBox = document.createElement('div');
-        appointmentBox.setAttribute('id', 'controller-appointment-box');
-        var appointmentLabel = document.createElement('div');
-        appointmentLabel.setAttribute('for', 'appointment-dropdown-list');
-        appointmentLabel.innerHTML = 'Appointment';
-        appointmentBox.appendChild(appointmentLabel);
-        var appointmentDropdown = document.createElement('select');
-        appointmentDropdown.setAttribute('id', 'appointment-dropdown-list');
-
-        var testOption = document.createElement('option');
-        testOption.setAttribute('value', 'haircut');
-        testOption.innerHTML = 'Haircut';
-        appointmentDropdown.appendChild(testOption);
-        appointmentBox.appendChild(appointmentDropdown);
+        var appointmentBox = $('<div/>', {
+            id: 'controller-appointment-box'
+        });
+        var appointmentLabel = $('<label/>', {
+            for: 'controller-appointment-dropdown-list'
+        })
+            .html('Appointment');
+        appointmentBox.append(appointmentLabel);
+        var appointmentDropdown = $('<select/>', {
+            id: 'controller-appointment-dropdown-list'
+        });
+        // TODO: Make connection to Database
+        var testOption = $('<option/>', {
+            value: 'haircut'
+        })
+            .html('Haircut');
+        appointmentDropdown.append(testOption);
+        appointmentBox.append(appointmentDropdown);
+        appointmentBox = appointmentBox.get(0);
 
         //Duration
-        var durationBox = document.createElement('div');
-        durationBox.setAttribute('id', 'controller-start-hour-box');
-        var durationLabel = document.createElement('label');
-        durationLabel.setAttribute('for', 'appointment-duration-input');
-        durationLabel.innerHTML = 'Duration';
-        durationBox.appendChild(durationLabel);
-        var durationInput = document.createElement('input');
-        durationInput.setAttribute('type', 'time');
-        durationInput.setAttribute('id', 'appointment-duration-input');
-        durationBox.appendChild(durationInput);
+        var durationBox = $('<div/>', {
+            id: 'controller-duration-box'
+        });
+        var durationLabel = $('<label/>', {
+            for: 'controller-duration-input'
+        })
+            .html('Duration');
+        durationBox.append(durationLabel);
+        var durationInput = $('<input/>', {
+            type: 'time',
+            id: 'controller-duration-input'
+        });
+        durationBox.append(durationInput);
+        durationBox = durationBox.get(0);
 
         //Unusual Event
         // Name
-        var nameBox = document.createElement('div');
-        nameBox.setAttribute('id', 'controller-name-box');
-        var nameLabel = document.createElement('label');
-        nameLabel.setAttribute('for', 'appointment-name-input');
-        nameLabel.innerHTML = 'Name:';
-        nameBox.appendChild(nameLabel);
-        var nameInput = document.createElement('input');
-        nameInput.setAttribute('type', 'text');
-        nameInput.setAttribute('id', 'appointment-name-input');
-        nameBox.appendChild(nameInput);
+        var nameBox = $('<div/>', {
+            id: 'controller-name-box'
+        });
+        var nameLabel = $('<label/>', {
+            for: 'controller-appointment-name-input'
+        })
+            .html('Name:');
+        nameBox.append(nameLabel);
+        var nameInput = $('<input/>', {
+            type: 'text',
+            id: 'controller-appointment-name-input',
+            placeholder: 'Appointment name'
+        });
+        nameBox.append(nameInput);
+        nameBox = nameBox.get(0);
 
-        //Checkbox for custom event
-        var isCustomEventCheckbox = document.createElement('input');
-        isCustomEventCheckbox.setAttribute('type', 'checkbox');
-        isCustomEventCheckbox.setAttribute('checked', 'checked');
-
-        var timeBox = document.createDocumentFragment();
         // startHour
-        var startHourBox = document.createElement('div');
-        startHourBox.setAttribute('id', 'controller-start-hour-box');
-        var startHourLabel = document.createElement('label');
-        startHourLabel.setAttribute('for', 'appointment-start-hour-input');
-        startHourLabel.innerHTML = 'From';
-        startHourBox.appendChild(startHourLabel);
-        var startHourInput = document.createElement('input');
-        startHourInput.setAttribute('type', 'time');
-        startHourInput.setAttribute('id', 'appointment-start-hour-input');
-        startHourBox.appendChild(startHourInput);
+        var startHourBox = $('<div/>', {
+            id: 'controller-start-hour-box'
+        });
+        var startHourLabel = $('<label/>', {
+            for: 'controller-appointment-start-hour-input'
+        })
+            .html('From');
+        startHourBox.append(startHourLabel);
+        var startHourInput = $('<input/>', {
+            type: 'time',
+            id: 'controller-appointment-start-hour-input'
+        });
+        startHourBox.append(startHourInput);
+        startHourBox = startHourBox.get(0);
 
         // endHour
-        var endHourBox = document.createElement('div');
-        endHourBox.setAttribute('id', 'controller-end-hour-box');
-        var endHourLabel = document.createElement('label');
-        endHourLabel.setAttribute('for', 'appointment-end-hour-input');
-        endHourLabel.innerHTML = 'To';
-        endHourBox.appendChild(endHourLabel);
-        var endHourInput = document.createElement('input');
-        endHourInput.setAttribute('type', 'time');
-        endHourInput.setAttribute('id', 'appointment-end-hour-input');
-        endHourBox.appendChild(endHourInput);
-
-        timeBox.appendChild(startHourBox);
-        timeBox.appendChild(endHourBox);
+        var endHourBox = $('<div/>', {
+            id: 'controller-end-hour-box'
+        });
+        var endHourLabel = $('<label/>', {
+            for: 'controller-appointment-end-hour-input'
+        })
+            .html('To');
+        endHourBox.append(endHourLabel);
+        var endHourInput = $('<input/>', {
+            type: 'time',
+            id: 'controller-appointment-end-hour-input'
+        });
+        endHourBox.append(endHourInput);
+        endHourBox = endHourBox.get(0);
 
         // Description
-        var descriptionBox = document.createElement('div');
-        descriptionBox.setAttribute('id', 'controller-description-box');
-        var descriptionLabel = document.createElement('label');
-        descriptionLabel.setAttribute('for', 'appointment-description-input');
-        descriptionLabel.innerHTML = 'Description';
-        descriptionBox.appendChild(descriptionLabel);
-        var descriptionInput = document.createElement('input');
-        descriptionInput.setAttribute('type', 'text');
-        descriptionInput.setAttribute('id', 'appointment-description-input');
-        descriptionBox.appendChild(descriptionInput);
+        var descriptionBox = $('<div/>', {
+            id: 'controller-description-box'
+        });
+        var descriptionLabel = $('<label/>', {
+            for: 'controller-appointment-description-input'
+        })
+            .html('Description');
+        descriptionBox.append(descriptionLabel);
+        var descriptionInput = $('<textarea/>', {
+            id: 'controller-appointment-end-hour-input',
+            placeholder: 'Extra info.'
+        });
+        descriptionBox.append(descriptionInput);
+        descriptionBox = descriptionBox.get(0);
 
-        var addAppointmentButton = document.createElement('div');
-        addAppointmentButton.className += 'btn';
-        addAppointmentButton.innerHTML = 'Add Appointment';
-
+        var addAppointmentButton = $('<div>')
+            .addClass('btn')
+            .html('Add Appointment');
 
         return scheduleAddController;
     });
@@ -220,37 +288,32 @@ var appointment = (function () {
     var controller = scheduleAddController();
 
     function showUnusualEventAdding() {
-        var output = document.querySelector('.scheduleAddController');
+        var $output = $('.scheduleAddController');
         var result = controller.renderUnusualEventAdding();
 
-        while (output.children.length != 0) {
-            output.removeChild(output.firstElementChild);
-        }
-        output.appendChild(result);
-        document.querySelector('#controller-back-button').addEventListener('click', showInitialState);
+        $output.empty();
+        $output.append(result);
+        $('#controller-back-button').on('click', showInitialState);
     }
 
     function showUsualEventAdding() {
-        var output = document.querySelector('.scheduleAddController');
+        var $output = $('.scheduleAddController');
         var result = controller.renderUsualEventAdding();
 
-        while (output.children.length != 0) {
-            output.removeChild(output.firstElementChild);
-        }
-        output.appendChild(result);
-        document.querySelector('#controller-back-button').addEventListener('click', showInitialState);
+        $output.empty();
+        $output.append(result);
+        $('#controller-back-button').on('click', showInitialState);
     }
 
     function showInitialState() {
-        var output = document.querySelector('.scheduleAddController');
+        var $output = $('.scheduleAddController');
         var result = controller.renderInitialState();
 
-        while (output.children.length != 0) {
-            output.removeChild(output.firstElementChild);
-        }
-        output.appendChild(result);
-        document.querySelector('#usual-event-button').addEventListener('click', showUsualEventAdding);
-        document.querySelector('#unusual-event-button').addEventListener('click', showUnusualEventAdding);
+        $output.empty();
+        $output.append(result);
+        $('#controller-usual-event-button').on('click', showUsualEventAdding);
+        $('#controller-unusual-event-button').on('click', showUnusualEventAdding);
+        controller.visualize();
     }
 
     showInitialState();
